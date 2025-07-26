@@ -1,21 +1,30 @@
 import express from 'express';
-import { getCommand } from './commands/registry';
-import { ProblemDetails } from './problem';
 import bodyParser from 'body-parser';
+import { ProblemDetails } from './problem';
+import { CommandHandler } from './commands/command-handler';
+import { kioskStartCommand, kioskStopCommand, nextCommand, playCommand, prevCommand } from './youtube-kisosk-commands';
 
 const PORT = parseInt(process.argv.find(arg => arg.startsWith('--port='))?.split('=')[1] || '', 10);
 if (!PORT) {
-  console.error('Missing --port parameter');
+  console.error('❌ Missing --port parameter');
   process.exit(1);
 }
+
+const commands: Record<string, CommandHandler> = {
+  play: playCommand,
+  next: nextCommand,
+  prev: prevCommand,
+  'kiosk-start': kioskStartCommand,
+  'kiosk-stop': kioskStopCommand
+};
 
 const app = express();
 app.use(bodyParser.json());
 
 app.post('/command', async (req, res) => {
   const { command, args = {} } = req.body;
+  const handler = commands[command];
 
-  const handler = getCommand(command);
   if (!handler) {
     const problem = new ProblemDetails(
       400,
