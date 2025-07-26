@@ -1,0 +1,23 @@
+{
+  "name": "gladioluz-youtube-music-kiosk",
+  "version": "1.0.0",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "start": "ts-node src/index.ts --port=9301"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "description": "",
+  "dependencies": {
+    "chrome-remote-interface": "^0.33.3",
+    "express": "^5.1.0"
+  },
+  "devDependencies": {
+    "@types/express": "^5.0.3",
+    "@types/node": "^24.1.0",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.8.3"
+  }
+}
