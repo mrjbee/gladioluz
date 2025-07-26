@@ -1,10 +1,38 @@
-import { CommandHandler, CommandContext, CommandResult } from './commands/command-handler';
+import { CommandHandler, CommandContext, CommandResult } from './commons/command';
 import { spawn, exec } from 'child_process';
 import { promisify } from 'util';
 import { config } from './config';
 import { Kiosk } from './kiosk';
 
 const execAsync = promisify(exec);
+
+export const loadRadioForCommand: CommandHandler = {
+  async run(ctx: CommandContext): Promise<CommandResult> {
+    const argId = ctx.args.videoId;
+    const argUrl = ctx.args.url;
+
+    let videoId: string | undefined;
+
+    if (typeof argId === 'string') {
+      videoId = argId;
+    } else if (typeof argUrl === 'string') {
+      const match = argUrl.match(/[?&]v=([a-zA-Z0-9_-]+)/);
+      if (match) {
+        videoId = match[1];
+      }
+    }
+
+    if (!videoId) {
+      throw new Error('Missing or invalid videoId/url');
+    }
+
+    const kiosk = new Kiosk();
+    const message = await kiosk.loadRadio(videoId);
+
+    return { result: 'ok', data: { message } };
+  }
+};
+
 
 export const playCommand: CommandHandler = {
   async run(): Promise<CommandResult> {
