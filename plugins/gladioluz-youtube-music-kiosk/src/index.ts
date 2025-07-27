@@ -11,5 +11,4 @@ const commands: Record<string, CommandHandler> = {
   'load-radio': loadRadioForCommand,
 };
 
-
-startPluginServer(commands);
+startPluginServer(commands, "gladioluz-youtube-music-kiosk", "1.0.0");
