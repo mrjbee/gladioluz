@@ -25,7 +25,16 @@ This approach offers:
 - Freedom — services can be written in any language
 - Transparency — behavior is easy to debug and reason about
 
-## 3. Services and components
+## 3. Deployment
+
+Gladioluz is distributed as a set of lightweight Docker containers and is typically managed using Docker Compose or K3s. Each service is self-contained and designed to run independently, making the platform highly modular and easy to maintain.
+
+Services have minimal memory footprint and are optimized for deployment on resource-constrained devices such as Raspberry Pi or similar ARM-based boards.
+
+All components communicate over a shared network using a central MQTT broker. Most services are stateless and can be restarted, updated, or replaced without affecting the rest of the system.
+
+
+## 4. Services and components
 
 ### `service-node-mcu-driver`
 Provides integration with ESP-based devices (e.g., NodeMCU, ESP8266, ESP32) running the `gladiolus-iot-framework` firmware, which is lightweight non-blocking firmware that simplifies pin control and state publishing. Supports heartbeat and structured device mapping.  
@@ -71,3 +80,18 @@ Utility service that listens for heartbeat signals from all known devices (publi
 Integrates with a Telegram bot and delivers messages to two predefined chats: a private admin channel for system reports and alerts, and a shared family group for reminders, door status updates, and general notifications.  
 **Dependency:** Telegram Bot API  
 **Internal Protocol:** HTTP
+
+
+## 5. Orchestration with Node-RED
+
+Node-RED is the recommended orchestration layer for Gladioluz deployments. Its key advantage is a visual web interface that allows building and modifying automation flows directly from a phone or tablet—without writing code or recompiling anything.
+
+Node-RED connects to the MQTT broker and listens for Gladioluz device events. It can react to state changes, send commands, generate reminders, and visualize system status.
+
+Typical flows include:
+
+- Door opened → Send Telegram message
+- Xbox app changed → Pause smart lighting
+- Device offline → Trigger recovery or alert
+
+Thanks to the unified protocol and consistent device structure, flows remain portable and decoupled from specific devices or integrations.
