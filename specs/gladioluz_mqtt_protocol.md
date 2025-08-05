@@ -10,11 +10,13 @@ The Gladioluz MQTT protocol is organized into distinct domains, each responsible
 
 All domains share a common topic prefix — the **Platform Root Topic**, which is configurable. By default, this root topic is set to `platform`.
 
+---
+
 ### Devices
 
 `platform/devices`
 
-This domain represents logical devices available to the automation layer — lights, sensors, media players, switches, and other components. 
+This domain represents logical devices available to the automation layer — lights, sensors, media players, switches, and other components.
 
 #### Device State Events
 
@@ -50,35 +52,18 @@ Each message in `platform/devices/<device-id>` is a full snapshot of the device'
 2. **Properties** — structured observable/controllable values
 3. **Supported commands** — list of operations this device accepts
 
-Schema:
+**Payload Schema:**
 
 ```jsonc
 {
-  // Unique ID of the physical source (ESP, agent, etc.)
   "physical_device": "string",
-
-  // Component alias inside the physical device (e.g. channel, slot)
   "alias": "string",
-
-  // Driver/service identifier responsible for managing this device
   "driver": "string",
-
-  // Optional display name shown in UI
   "title": "string",
-
-  // Device type — predefined set of supported platform device types
   "type": "string",
-
-  // Optional schema version of this structure
   "version": 1,
-
-  // Timestamp (ISO 8601) when power-related state was last changed
   "powerChangedAt": "string",
-
-  // Optional list of commands supported by this device (may depend on type; may be empty)
   "supported_commands": ["string", "..."],
-
-  // Optional structured state properties
   "properties": {
     "<property-name>": {
       "value": "any",
@@ -88,19 +73,13 @@ Schema:
       "changed_from_value": "any"
     }
   },
-
-  // Optional, indicates device is hidden or ignored by user (TODO: rename 'disabled' to 'hidden' or 'ignored' in future)
   "disabled": true,
-
-  // Optional last known IP address (reported by device or network monitor)
   "ip": "string",
-
-  // Usually indicates whether the physical device is currently active and available
   "enabled": true
 }
 ```
 
-Examples:
+**Examples:**
 
 ```json
 {
@@ -167,7 +146,7 @@ The payload must follow this schema:
 }
 ```
 
-Examples:
+**Examples:**
 
 ```json
 {
@@ -188,12 +167,191 @@ Examples:
 }
 ```
 
-**Command Fields**
-
-- `alias`: command name, must match one of the entries in `supported_commands`
-- `value`: command payload (could be a primitive or object depending on command type)
-- `user`: optional source tag, typically "user" or "system"
-
 > ⚠️ If the command is not supported or malformed, the device service will silently ignore it. No state update or error event will be published.
 
 Successful execution typically results in a `platform/devices/<device-id>` update with the new property state.
+
+---
+### Streams
+
+**Topic prefix:** `platform/streams`
+
+This domain is used for **fire-and-forget event streams**. Messages published under `streams` are **not retained**, **not structured as state**, and **not guaranteed** to be delivered or repeated.
+
+Unlike `devices`, which publish current snapshots, **stream messages are transient**. If missed — they are lost.
+
+**General Rules**:
+
+- **No strict topic hierarchy.** Any subtopic is allowed: `notifications`, `physical-devices/heartbeats`, `logs/system`, `tts`, etc.
+- **Each subtopic has its own structure.** There is no unified schema across `streams`, but within one subtopic, structure should be consistent.
+
+---
+
+#### Notifications
+
+**Topic:** `platform/streams/notifications`\
+**Consumer:** `service-telegram` (and optionally others)
+
+Human-oriented messages: user alerts, announcements, reminders. These are intended for display in UI, Telegram bots, or notification services.
+
+**Payload Schema:**
+
+```jsonc
+{
+  "message": "string",   // Required. Human-readable text
+  "private": false         // Optional. true = admin-only; false = family/group message
+}
+```
+
+**Example:**
+
+```json
+{
+  "message": "Front door was closed",
+  "private": false
+}
+```
+
+---
+
+#### Physical Device Heartbeats
+
+**Topic:** `platform/streams/physical-devices/heartbeats`\
+**Consumer:** `service-device-watcher`
+
+Heartbeat messages emitted by physical devices — ESPs, agents, containers, and others — via dedicated platform services.\
+Used to determine device availability, restart detection, and daily uptime reports.
+
+> These events are **not retained**. If a heartbeat is missed, the platform may consider the device **offline**.
+
+**Requirements**:
+
+- Devices must **emit heartbeats via an appropriate Gladioluz platform service** (e.g., `service-node-mcu-driver`, `gladiolus-agent`, etc.)
+- If no heartbeat is received for a configurable timeout period (e.g., 60s), the device is considered **unavailable**
+- `uptime` is always reported in **milliseconds**
+
+---
+
+**Payload Schema:**
+
+```jsonc
+{
+  "deviceId": "string",    // Required. Unique physical device ID
+  "type": "string",        // Required. Device category (e.g. "esp", "agent", "service")
+  "details": {              // Optional. Additional info
+    "ip": "string",        // IP address (if known)
+    "mac": "string",       // MAC address (if known)
+    "uptime": number        // Required. Uptime in milliseconds
+  }
+}
+```
+
+---
+
+**Examples:**
+
+```json
+{
+  "deviceId": "fakelaptop",
+  "type": "pc_board",
+  "details": {
+    "mac": "d0:39:57:48:31:2f",
+    "uptime": 1754416103334
+  }
+}
+```
+
+```json
+{
+  "deviceId": "app_device-watcher",
+  "type": "service",
+  "details": {
+    "ip": "172.19.0.2",
+    "uptime": 1645821620
+  }
+}
+```
+
+```json
+{
+  "deviceId": "ESP_bg_my_lamp",
+  "type": "node_mcu_board",
+  "details": {
+    "mac": "D8:BF:C0:D7:F3:F4",
+    "uptime": 256039760
+  }
+}
+```
+
+---
+### Configs
+
+**Topic prefix:** `platform/configs`
+
+This domain is reserved for publishing configuration metadata used by the platform and its services. These topics are **read-only** from the perspective of platform services and are intended to be populated by external publishers (such as UI editors, config sync tools, or admin dashboards).
+
+> ⚠️ Subtopics under `platform/configs` are **reserved**. Only specific keys and formats are permitted. Unrecognized or malformed messages must be ignored by consumers.
+
+#### Device Configs
+
+**Topic:** `platform/configs/devices`
+
+
+
+This topic is optionally used to attach **human-friendly metadata** to known devices. The messages are published as a single JSON object keyed by `device-id` and are typically consumed by UI or orchestration tools to enhance visibility.
+
+Unlike device state, this configuration is **not reported by the device itself**, but **published externally** (e.g. by UI service or configuration synchronizer).
+
+> ⚠️ Not all services support these configs. Only devices managed by services that explicitly support config enrichment will reflect the additional data.
+
+**Typical Use Cases:**
+
+- Assigning custom display names (`title`)
+- Indicating user-disabled devices (`disabled: true`)
+- (Planned) Grouping or UI hints
+
+**Payload Schema:**
+
+```jsonc
+{
+  "<device-id>": {
+    "title": "string",       // Optional display name override
+    "disabled": true          // Optional manual override to hide/disable the device
+  },
+  ...
+}
+```
+
+**Example:**
+
+```json
+{
+  "light::ESP_bg_balcony:main": {
+    "title": "Balcony: Light"
+  },
+  "light::ESP_bg_my_room:1": {
+    "title": "Master Room: Light"
+  },
+  "light::ESP_bg_my_room:2": {
+    "title": "Master Room: Light (Disabled)",
+    "disabled": true
+  },
+  "light::ESP_bg_kids:main": {
+    "title": "Kids Room: Light"
+  },
+  "light::ESP_bg_my_lamp:main": {
+    "title": "Master Room: Table Light"
+  },
+  "light::wled_TV:TV": {
+    "title": "Living Room: WLED"
+  },
+  "light::wled_Master_Table:Master_Table": {
+    "title": "Master Room: WLED"
+  },
+  "light::ESP_bg_entance_door:main": {
+    "title": "Hall: Light"
+  }
+}
+```
+
+> These configs are currently considered **optional** and **non-authoritative**. Environment variables remain the primary config source for most services.
