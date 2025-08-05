@@ -62,8 +62,12 @@ export const kioskStartCommand: CommandHandler = {
   async run(): Promise<CommandResult> {
     const kiosk = new Kiosk();
     const running = await kiosk.isRunning();
-    if (running) return { result: 'ok', data: { message: '⚠️ Chrome already running' } };
-
+    if (running) {
+      console.log('⚠️ Chrome already running');
+      return { result: 'ok', data: { message: '⚠️ Chrome already running' } }
+    };
+    console.log('Starting kiosk...');
+   
     const chromePath = config.get('kiosk.executable') as string;
     const profile = config.get('kiosk.profile.dir') as string;
     const port = config.get('kiosk.remote.port') as number;
@@ -81,10 +85,28 @@ export const kioskStartCommand: CommandHandler = {
       'https://music.youtube.com'
     ];
 
-    spawn(chromePath, args, {
+    const child = spawn(chromePath, args, {
       detached: true,
-      stdio: 'ignore'
-    }).unref();
+      stdio: ['ignore', 'pipe', 'pipe']
+    });
+
+    child.stdout?.on('data', (data) => {
+      console.log(`[kiosk stdout] ${data.toString().trim()}`);
+    });
+    
+    child.stderr?.on('data', (data) => {
+      console.error(`[kiosk stderr] ${data.toString().trim()}`);
+    });
+
+    child.on('error', (err) => {
+      console.error('[kiosk error]', err);
+    });
+    
+    child.on('exit', (code, signal) => {
+      console.log(`[kiosk exit] code=${code}, signal=${signal}`);
+    });
+
+    child.unref();
 
     return { result: 'ok', data: { message: '✅ Chrome launched in kiosk mode' } };
   }
