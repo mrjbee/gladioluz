@@ -81,4 +81,3 @@ systemctl --user enable gladioluz-plugin@gladioluz-youtube-music-kiosk.service
 ```bash
 journalctl --user -u gladioluz-plugin@gladioluz-youtube-music-kiosk.service -f
 ```
-
