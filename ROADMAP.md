@@ -23,6 +23,58 @@ This change is postponed due to lack of practical benefit at this stage.
 Filtering MQTT topics by `nature` or `class` is currently not needed — all devices are typically discovered via `platform/devices/#`, and specific logic is attached later based on the payload.  
 Maintaining flat topic structure keeps publishing and subscription simpler and reduces implementation friction.
 
+### TODO: Device ID v2 (unified naming)
+
+Introduce new **deviceId** format:
+
+```
+deviceId := <originId>.<localName>
+originId := <namespace>.<name>
+localName := [A-Za-z0-9_-]+   // no dots
+```
+
+Parsing rule: split by the last `.` → left part is `originId`, right part is `localName`.
+
+---
+
+#### Namespaces
+
+* **esp** — NodeMCU / ESP boards
+* **wled** — WLED controllers
+* **hyperion** — Hyperion instances
+* **ip** — pseudo devices identified by IP
+* **pc** — desktop/laptop hosts
+* **nodered** — Node-RED virtual/context units
+
+---
+
+#### LocalName convention
+
+* **Multi-class origins (esp, nodered, pc)** → `class-alias`
+  Examples:
+
+  * `esp.ESP_bg_my_room.light-1`
+  * `esp.ESP_bg_my_room.buzzer-main`
+  * `nodered.home.value-TIME_OF_DAY`
+  * `pc.fakelaptop.screen-main`
+
+* **Mono-class origins (wled, hyperion, ip)** → just alias (no class duplication)
+  Examples:
+
+  * `wled.TV.TV`
+  * `hyperion.Monitor.Monitor`
+  * `ip.kiev_flat.main`
+
+---
+
+#### Benefits
+
+* Single parsing rule (last dot separation)
+* Namespace clarifies source (esp/wled/ip/pc/nodered/…)
+* Consistent across physical, virtual, and pseudo devices
+* Avoids ambiguity: in multi-class origins, type is explicit in localName; in mono-class origins it’s implicit in namespace.
+
+
 ## Button Devices
 
 - Introduce a new physical device with type `myhome.firmware.sensor.Button`
