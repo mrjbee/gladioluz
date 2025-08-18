@@ -1,79 +1,10 @@
 # Gladioluz Design Notes
 
-## General TODOs
-- Replace `IP` with `Beacon` as the new `type` (or `class`, depending on point 1).
-
 This document captures raw ideas, architecture drafts, naming experiments, and decision records related to the ongoing evolution of the Gladioluz platform.
 It serves as a flexible space for brainstorming and iterating before final specs are formalized.
 
-## Device->Unit migration
-
-- Introduce a new `unit` model to replace `device`, with `nature` and `class` fields instead of `type`.
-  - `nature` defines the domain of the unit (`thing`, `virtual`, `logic`, `context`)
-  - Rename `type` to `class`, simplify values, and update documentation accordingly.
-- Make `enabled` and `powerChangedAt` optional fields, depending on the `nature` of the unit.
-
-## MQTT structure and unit ID
-
-- Transfer to tree structure: `platform/units/<nature>/<class>/<device>/<alias>`
-- In code use URN: `urn://gladiolus-unit/<nature>/<class>/<device>/<alias>`
-
-**Deferred:**  
-This change is postponed due to lack of practical benefit at this stage.  
-Filtering MQTT topics by `nature` or `class` is currently not needed — all devices are typically discovered via `platform/devices/#`, and specific logic is attached later based on the payload.  
-Maintaining flat topic structure keeps publishing and subscription simpler and reduces implementation friction.
-
-### TODO: Device ID v2 (unified naming)
-
-Introduce new **deviceId** format:
-
-```
-deviceId := <originId>.<localName>
-originId := <namespace>.<name>
-localName := [A-Za-z0-9_-]+   // no dots
-```
-
-Parsing rule: split by the last `.` → left part is `originId`, right part is `localName`.
-
----
-
-#### Namespaces
-
-* **esp** — NodeMCU / ESP boards
-* **wled** — WLED controllers
-* **hyperion** — Hyperion instances
-* **ip** — pseudo devices identified by IP
-* **pc** — desktop/laptop hosts
-* **nodered** — Node-RED virtual/context units
-
----
-
-#### LocalName convention
-
-* **Multi-class origins (esp, nodered, pc)** → `class-alias`
-  Examples:
-
-  * `esp.ESP_bg_my_room.light-1`
-  * `esp.ESP_bg_my_room.buzzer-main`
-  * `nodered.home.value-TIME_OF_DAY`
-  * `pc.fakelaptop.screen-main`
-
-* **Mono-class origins (wled, hyperion, ip)** → just alias (no class duplication)
-  Examples:
-
-  * `wled.TV.TV`
-  * `hyperion.Monitor.Monitor`
-  * `ip.kiev_flat.main`
-
----
-
-#### Benefits
-
-* Single parsing rule (last dot separation)
-* Namespace clarifies source (esp/wled/ip/pc/nodered/…)
-* Consistent across physical, virtual, and pseudo devices
-* Avoids ambiguity: in multi-class origins, type is explicit in localName; in mono-class origins it’s implicit in namespace.
-
+## General TODOs
+- Introduce `Beacon` online property. Disable physical device mimic.
 
 ## Button Devices
 
