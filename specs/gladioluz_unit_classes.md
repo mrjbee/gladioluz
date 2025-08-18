@@ -1,0 +1,53 @@
+# Gladioluz Unit Classes Inventory
+
+This document summarizes the known **unit classes** used within the Gladioluz platform. Each class belongs to a `nature` and defines a set of properties and supported commands.
+
+---
+
+## 📊 Classes Table
+
+| Class              | Nature         | Properties                      | Commands                                    |
+|--------------------|----------------|----------------------------------|---------------------------------------------|
+| `class.Light`      | `nature.Thing` | brightness, effect, preset       | common.setBrightness, common.setEffect, common.setPreset |
+| `class.Buzzer`     | `nature.Thing` | beep                             | common.playTone                             |
+| `class.Magnet`     | `nature.Thing` | value                            | —                                           |
+| `class.Illumination` | `nature.Thing` | value                           | —                                           |
+| `class.Console`    | `nature.Thing` | app, wifi, online                | —                                           |
+| `class.TV`         | `nature.Thing` | app, online                      | —                                           |
+| `class.Microphone` | `nature.Thing` | under_usage                      | —                                           |
+| `class.Screen`     | `nature.Thing` | locked                           | —                                           |
+| `class.X11`        | `nature.Thing` | apps                             | —                                           |
+| `class.Beacon`     | `nature.Virtual` | —                              | —                                           |
+
+---
+
+## 📜 Unified Commands
+
+| Command                | Description                                | Example Payload |
+|------------------------|--------------------------------------------|----------------|
+| `common.setBrightness` | Set brightness level (0–100)               | `{ "alias": "common.setBrightness", "value": 75, "user": "system" }` |
+| `common.setEffect`     | Enable/disable visual effect (boolean)     | `{ "alias": "common.setEffect", "value": true, "user": "user" }` |
+| `common.setPreset`     | Switch preset by index (integer)           | `{ "alias": "common.setPreset", "value": 2, "user": "system" }` |
+| `common.playTone`      | Play tone with `{ tone, delay }` payload   | `{ "alias": "common.playTone", "value": { "tone": 200, "delay": 500 }, "user": "system" }` |
+
+---
+
+## 🧾 Properties Data Types
+
+| Property       | Data Type          | Notes |
+|----------------|--------------------|-------|
+| `brightness`   | integer (0–100)    | Current brightness level |
+| `effect`       | boolean            | Visual effect enabled/disabled |
+| `preset`       | integer            | Preset index (implementation specific) |
+| `beep`         | string             | Format `"tone,delay"` (Hz, ms) |
+| `value` (Magnet) | boolean          | `true` = open, `false` = closed |
+| `value` (Illumination) | integer   | Light level (scale depends on firmware) |
+| `app`          | string \/ null     | Active application ID or null |
+| `wifi`         | boolean            | Wi‑Fi connection status |
+| `online`       | boolean            | Availability (independent from `enabled`) |
+| `under_usage`  | boolean            | Microphone active status |
+| `locked`       | boolean            | Screen lock state |
+| `apps`         | array of string    | List of visible X11 application class names |
+
+---
+

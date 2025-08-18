@@ -1,4 +1,4 @@
-# Gladioluz Platform MQTT Protocol (v0.1 BETA)
+# Gladioluz Platform MQTT Protocol (v0.2 BETA)
 
 This protocol defines the standardized message structure and topic hierarchy for MQTT-based communication between components of the Gladioluz platform: services, adapters, agents, and physical devices. Its goal is to **unify automation logic**, **decouple low-level integrations**, and support **flexible orchestration** across a distributed environment.
 
@@ -12,58 +12,60 @@ All domains share a common topic prefix — the **Platform Root Topic**, which i
 
 ---
 
-### Devices
+### Units
 
-`platform/devices`
+`platform/units`
 
-This domain represents logical devices available to the automation layer — lights, sensors, media players, switches, and other components.
+This domain represents logical **units** (ex‑devices) available to the automation layer — lights, sensors, media players, switches, and other components.
 
-#### Device State Events
+#### Unit State Events
 
-Each device publishes its current state to the topic:
-
-```
-platform/devices/<device-id>
-```
-
-Each device is identified by a unique `device-id`, following the convention:
+Each unit publishes its current state to the topic:
 
 ```
-<short-type>::<physical-device-id>:<alias>
+platform/units/<unit-id>
+```
+
+Each unit is identified by a unique `unit-id`, following the **flat** convention:
+
+```
+<originId>.<localName>
 ```
 
 **Where:**
 
-- `short-type` — a simplified form of the `type` field (lowercase, dots removed).
-- `physical-device-id` — the physical source ID (matches `physical_device`).
-- `alias` — local component name inside the physical device (matches `alias`).
+- `originId` — `<namespace>.<name>` that identifies the physical or virtual origin (e.g. `esp.ESP_bg_balcony`, `wled.192_168_0_21`).
+- `localName` — local component name within the origin. For multi‑class origins it typically includes class in the name (e.g. `light-main`). **No dots** are allowed in `localName`.
+
+**Parsing rule:** split by the **last** `.` → left part is `originId`, right part is `localName`.
 
 **Examples:**
 
-- `light::ESP_bg_balcony:main`
-- `sensor::ESP_my_room:1`
-- `ip::chrome_tv:main`
+- `esp.ESP_bg_balcony.light-main`
+- `wled.192_168_0_21.main`
 
-> ⚠️ `device-id` must be unique and stable. It is referenced in configuration, commands, and automation logic.
+> ⚠️ `unit-id` must be unique and stable. It is referenced in configuration, commands, and automation logic.
 
-Each message in `platform/devices/<device-id>` is a full snapshot of the device's current state. It includes:
+Each message in `platform/units/<unit-id>` is a full snapshot of the unit's current state. It includes:
 
-1. **General information** — metadata about the device and its origin
+1. **General information** — metadata about the unit and its origin
 2. **Properties** — structured observable/controllable values
-3. **Supported commands** — list of operations this device accepts
+3. **Supported commands** — list of operations this unit accepts
 
 **Payload Schema:**
 
 ```jsonc
 {
-  "physical_device": "string",
-  "alias": "string",
-  "driver": "string",
-  "title": "string",
-  "type": "string",
+  "localName": "string",                 // e.g. "light-main" or "main"
+  "originId": "string",                 // e.g. "esp.ESP_bg_balcony"
+  "driver": "string",                   // e.g. "nodemcu-unit-driver"
+  "nature": "nature.Thing | nature.Virtual | nature.Logic | nature.Context",
+  "title": "string",                    // human-friendly title
+  "class": "class.Light | class.*",     // replaces legacy `type`
   "version": 1,
-  "powerChangedAt": "string",
-  "supported_commands": ["string", "..."],
+  "ip": "string",                       // optional, when applicable
+  "powerChangedAt": "ISO timestamp",    // optional; depends on `nature`
+  "supported_commands": ["string", "..."], // list of commands accepted by the unit
   "properties": {
     "<property-name>": {
       "value": "any",
@@ -73,8 +75,6 @@ Each message in `platform/devices/<device-id>` is a full snapshot of the device'
       "changed_from_value": "any"
     }
   },
-  "disabled": true,
-  "ip": "string",
   "enabled": true
 }
 ```
@@ -83,31 +83,29 @@ Each message in `platform/devices/<device-id>` is a full snapshot of the device'
 
 ```json
 {
-  "physical_device": "ESP_bg_entance_door",
-  "driver": "nodemcu-java-driver",
-  "powerChangedAt": "2025-07-17T19:42:50.287958",
-  "alias": "main",
-  "supported_commands": [
-    "common.setBrightness",
-    "common.setEffect"
-  ],
-  "title": "Hall: Light",
-  "type": "myhome.firmware.Light",
+  "localName": "light-main",
+  "originId": "esp.ESP_bg_balcony",
+  "driver": "nodemcu-unit-driver",
+  "nature": "nature.Thing",
+  "powerChangedAt": "2025-08-17T13:23:25.156492",
+  "supported_commands": ["common.setBrightness", "common.setEffect"],
+  "title": "Balcony: Main Light",
+  "class": "class.Light",
   "version": 1,
   "properties": {
     "brightness": {
       "updatedBy": "system",
-      "changedAt": "2025-08-05T19:09:19.58574",
-      "value": 20,
-      "changed_from_value": 100,
-      "updatedAt": "2025-08-05T19:22:19.60472"
+      "changedAt": "2025-08-18T19:03:36.71672",
+      "value": 100,
+      "changed_from_value": 0,
+      "updatedAt": "2025-08-18T23:04:07.71252"
     },
     "effect": {
-      "updatedBy": "system",
-      "changedAt": "2025-08-05T11:01:17.735519",
+      "updatedBy": "user",
+      "changedAt": "2025-08-16T22:55:21.886164",
       "value": false,
-      "changed_from_value": true,
-      "updatedAt": "2025-08-05T19:20:58.742227"
+      "changed_from_value": null,
+      "updatedAt": "2025-08-18T23:03:07.624805"
     }
   },
   "enabled": true
@@ -116,27 +114,45 @@ Each message in `platform/devices/<device-id>` is a full snapshot of the device'
 
 ```json
 {
-  "physical_device": "chrome_tv",
-  "driver": "ip-checker",
-  "powerChangedAt": "2025-06-26T00:31:26.59772",
-  "alias": "main",
-  "supported_commands": [],
-  "type": "myhome.firmware.IP",
+  "localName": "main",
+  "originId": "wled.192_168_0_21",
+  "driver": "wled-unit-driver",
+  "nature": "nature.Thing",
+  "ip": "192.168.0.21",
+  "powerChangedAt": "2025-08-17T13:23:27.813519",
+  "supported_commands": ["common.setBrightness", "common.setPreset"],
+  "title": "Living Room: TV WLED",
+  "class": "class.Light",
   "version": 1,
-  "properties": {},
-  "enabled": false
+  "properties": {
+    "brightness": {
+      "updatedBy": "system",
+      "changedAt": "2025-08-18T23:01:57.090433",
+      "value": 5,
+      "changed_from_value": 100,
+      "updatedAt": "2025-08-18T23:03:46.078967"
+    },
+    "preset": {
+      "updatedBy": "system",
+      "changedAt": "2025-08-18T17:54:39.743614",
+      "value": 1,
+      "changed_from_value": 2,
+      "updatedAt": "2025-08-18T23:04:39.630843"
+    }
+  },
+  "enabled": true
 }
 ```
 
-#### Device Commands
+#### Unit Commands
 
-To execute an action on a device, a command must be published to the following topic:
+To execute an action on a unit, publish a command to the following topic:
 
 ```
-platform/devices/<device-id>/commands
+platform/units/<unit-id>/commands
 ```
 
-The payload must follow this schema:
+The payload must follow this schema :
 
 ```jsonc
 {
@@ -158,18 +174,15 @@ The payload must follow this schema:
 
 ```json
 {
-  "alias": "common.playTone",
-  "value": {
-    "tone": 200,
-    "delay": 500
-  },
+  "alias": "common.setPreset",
+  "value": 0,
   "user": "system"
 }
 ```
 
-> ⚠️ If the command is not supported or malformed, the device service will silently ignore it. No state update or error event will be published.
+> ⚠️ If the command is not supported or malformed, the unit service will silently ignore it. No state update or error event will be published.
 
-Successful execution typically results in a `platform/devices/<device-id>` update with the new property state.
+Successful execution typically results in a `platform/units/<unit-id>` update with the new property state.
 
 ---
 ### Streams
@@ -294,15 +307,15 @@ This domain is reserved for publishing configuration metadata used by the platfo
 
 #### Device Configs
 
-**Topic:** `platform/configs/devices`
+**Topic:** `platform/configs/units`
 
 
 
-This topic is optionally used to attach **human-friendly metadata** to known devices. The messages are published as a single JSON object keyed by `device-id` and are typically consumed by UI or orchestration tools to enhance visibility.
+This topic is optionally used to attach **human-friendly metadata** to known units. The messages are published as a single JSON object keyed by `unit-id` and are typically consumed by UI or orchestration tools to enhance visibility.
 
-Unlike device state, this configuration is **not reported by the device itself**, but **published externally** (e.g. by UI service or configuration synchronizer).
+Unlike unit state, this configuration is **not reported by the unit itself**, but **published externally** (e.g. by UI service or configuration synchronizer).
 
-> ⚠️ Not all services support these configs. Only devices managed by services that explicitly support config enrichment will reflect the additional data.
+> ⚠️ Not all services support these configs. Only units managed by services that explicitly support config enrichment will reflect the additional data.
 
 **Typical Use Cases:**
 
@@ -314,9 +327,9 @@ Unlike device state, this configuration is **not reported by the device itself**
 
 ```jsonc
 {
-  "<device-id>": {
+  "<unit-id>": {
     "title": "string",       // Optional display name override
-    "disabled": true          // Optional manual override to hide/disable the device
+    "disabled": true          // Optional manual override to hide/disable the unit
   },
   ...
 }
