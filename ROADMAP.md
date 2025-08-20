@@ -4,7 +4,8 @@ This document captures raw ideas, architecture drafts, naming experiments, and d
 It serves as a flexible space for brainstorming and iterating before final specs are formalized.
 
 ## General TODOs
-- Introduce `Beacon` online property. Disable physical device mimic.
+- Rework service heartbeats: drop physical device mimic
+- Implement presets units with in/out conditions — add lightweight policy-like units that store the last evaluated preset and switch when entry/exit conditions are met.
 
 ## Button Devices
 

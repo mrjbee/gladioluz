@@ -17,7 +17,7 @@ This document summarizes the known **unit classes** used within the Gladioluz pl
 | `class.Microphone` | `nature.Thing` | under_usage                      | —                                           |
 | `class.Screen`     | `nature.Thing` | locked                           | —                                           |
 | `class.X11`        | `nature.Thing` | apps                             | —                                           |
-| `class.Beacon`     | `nature.Virtual` | —                              | —                                           |
+| `class.Beacon`     | `nature.Virtual` | online                              | —                                           |
 
 ---
 
@@ -44,7 +44,7 @@ This document summarizes the known **unit classes** used within the Gladioluz pl
 | `value` (Illumination) | integer   | Light level (scale depends on firmware) |
 | `app`          | string \/ null     | Active application ID or null |
 | `wifi`         | boolean            | Wi‑Fi connection status |
-| `online`       | boolean            | Availability (independent from `enabled`) |
+| `online`       | boolean            | Availability |
 | `under_usage`  | boolean            | Microphone active status |
 | `locked`       | boolean            | Screen lock state |
 | `apps`         | array of string    | List of visible X11 application class names |
