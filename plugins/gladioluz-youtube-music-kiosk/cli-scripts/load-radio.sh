@@ -15,6 +15,8 @@ tracks_0=(
 # 1: hip‑hop / boom‑bap
 tracks_1=(
   "https://music.youtube.com/watch?v=f17KRK0CYRY&si=-kFz0JUSvvLP944V"  # The Notorious B.I.G – My Downfall (Mono Cdm remix) → classic East Coast, gritty boombap
+  "https://music.youtube.com/watch?v=-IbbkPN6KPI&si=kA2UfJi-ujegVO2c"
+  "https://music.youtube.com/watch?v=iftXUHW79AY&si=LVGU0Ixwp5YN8YPQ"
 )
 # 2: pop‑rap / R&B
 tracks_2=(
