@@ -75,9 +75,30 @@ Each message in `platform/units/<unit-id>` is a full snapshot of the unit's curr
       "changed_from_value": "any"
     }
   },
+  "propertiesSchema": {}, //optional schema definition for properties
   "enabled": true
 }
 ```
+
+**Optional: Properties Schema**
+
+Units may optionally include a `propertiesSchema` object that declares the domain of allowed values for specific properties (useful for validation and UI hints).
+
+```jsonc
+"propertiesSchema": {
+  "<property-name>": {
+    "$schema": "http://json-schema.org/draft-07/schema#",
+    "type": "string",
+    "enum": ["..."] // domain for this property
+  }
+}
+```
+Notes:
+
+propertiesSchema is purely declarative; it does not change runtime behavior.
+
+Values published under properties.*.value MUST comply with the declared schema when present.
+
 
 **Examples:**
 
@@ -143,6 +164,36 @@ Each message in `platform/units/<unit-id>` is a full snapshot of the unit's curr
   "enabled": true
 }
 ```
+```json
+{
+  "localName": "master-room",
+  "originId": "platform.policy",
+  "driver": "policy-unit-service",
+  "nature": "nature.Context",
+  "class": "class.Policy",
+  "title": "Master Room Policy",
+  "version": 1,
+  "supported_commands": ["context.setEnumValue", "context.dropValue"],
+  "properties": {
+    "current": {
+      "value": "work",
+      "updatedBy": "system",
+      "updatedAt": "2025-08-24T15:04:11.332Z",
+      "changedAt": "2025-08-24T15:04:11.332Z",
+      "changed_from_value": null
+    }
+  },
+  "propertiesSchema": {
+    "current": {
+      "$schema": "http://json-schema.org/draft-07/schema#",
+      "type": "string",
+      "enum": ["work", "entertainment", "party", "training", "quiet", "unleashed"]
+    }
+  },
+  "enabled": true
+}
+```
+
 
 #### Unit Commands
 

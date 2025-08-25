@@ -18,6 +18,7 @@ This document summarizes the known **unit classes** used within the Gladioluz pl
 | `class.Screen`     | `nature.Thing` | locked                           | —                                           |
 | `class.X11`        | `nature.Thing` | apps                             | —                                           |
 | `class.Beacon`     | `nature.Virtual` | online                              | —                                           |
+| `class.Policy`   | `nature.Context` | current                        | context.setEnumValue, context.dropValue |
 
 ---
 
@@ -29,7 +30,8 @@ This document summarizes the known **unit classes** used within the Gladioluz pl
 | `common.setEffect`     | Enable/disable visual effect (boolean)     | `{ "alias": "common.setEffect", "value": true, "user": "user" }` |
 | `common.setPreset`     | Switch preset by index (integer)           | `{ "alias": "common.setPreset", "value": 2, "user": "system" }` |
 | `common.playTone`      | Play tone with `{ tone, delay }` payload   | `{ "alias": "common.playTone", "value": { "tone": 200, "delay": 500 }, "user": "system" }` |
-
+| `context.setEnumValue` | Set an enumerated property value (string defined by schema enum) | `{ "alias": "context.setEnumValue", "value": "work", "user": "system" }` |
+| `context.dropValue`    | Drop the current value of an enum property, resulting in a `null` or default value | `{ "alias": "context.dropValue", "user": "system" }` |
 ---
 
 ## 🧾 Properties Data Types
@@ -48,6 +50,8 @@ This document summarizes the known **unit classes** used within the Gladioluz pl
 | `under_usage`  | boolean            | Microphone active status |
 | `locked`       | boolean            | Screen lock state |
 | `apps`         | array of string    | List of visible X11 application class names |
+| `current` | string | Active enumerated value, must be one of the items defined in `propertiesSchema.<prop>.enum`. |
+
 
 ---
 

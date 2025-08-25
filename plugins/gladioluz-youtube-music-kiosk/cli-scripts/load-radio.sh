@@ -11,6 +11,7 @@ tracks_0=(
   "https://music.youtube.com/watch?v=LzEhfnnSVDE&si=iZVWEGMMBfLDnVM5"
   "https://music.youtube.com/watch?v=ZUtAe5PUKtE&si=V5zJWrGotF_tAzgr"
   "https://music.youtube.com/watch?v=SWC_1gH2fx4&si=wS7nF0Z3KN3cjzcG"
+  "https://music.youtube.com/watch?v=kofrPBBmpqU&si=hgUZSDUiFn41_gW9"
 )
 # 1: hip‑hop / boom‑bap
 tracks_1=(
