@@ -52,6 +52,5 @@ This document summarizes the known **unit classes** used within the Gladioluz pl
 | `apps`         | array of string    | List of visible X11 application class names |
 | `current` | string | Active enumerated value, must be one of the items defined in `propertiesSchema.<prop>.enum`. |
 
-
 ---
 
