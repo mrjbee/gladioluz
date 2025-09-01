@@ -1,7 +1,38 @@
+// server.ts
 import bodyParser from "body-parser";
 import express from "express";
 import { CommandHandler } from "./command";
 import { ProblemDetails } from "./problem";
+import crypto from "crypto";
+
+function makeAuth(token?: string) {
+  if (!token) return (_req: any, _res: any, next: any) => next(); // backward-compatible
+  const expected = Buffer.from(token, "utf8");
+  return (req: any, res: any, next: any) => {
+    const auth = req.header("authorization") || "";
+    const m = /^Bearer\s+(.+)$/i.exec(auth);
+    const providedStr = m?.[1] || "";
+    const provided = Buffer.from(providedStr, "utf8");
+
+    // timing-safe compare; also match lengths to avoid leaks
+    const ok =
+      provided.length === expected.length &&
+      crypto.timingSafeEqual(provided, expected);
+
+    if (!ok) {
+      const problem = new ProblemDetails(
+        401,
+        "Missing or invalid bearer token",
+        req.path || "/",
+        "https://gladioluz.io/problems/invalid-token",
+        "Unauthorized"
+      );
+      res.setHeader('WWW-Authenticate', 'Bearer realm="gladioluz-plugin"');
+      return res.status(problem.status).json(problem.toJSON());
+    }
+    next();
+  };
+}
 
 export function startPluginServer(
   commands: Record<string, CommandHandler>,
@@ -12,9 +43,13 @@ export function startPluginServer(
     process.argv.find((arg) => arg.startsWith("--port="))?.split("=")[1] || "",
     10
   );
-
   const HOST =
     process.argv.find((arg) => arg.startsWith("--host="))?.split("=")[1] || "127.0.0.1";
+
+  // optional token (CLI has priority; env as fallback)
+  const TOKEN =
+    process.argv.find((arg) => arg.startsWith("--token="))?.split("=")[1] ||
+    process.env.GLZ_PLUGIN_TOKEN;
 
   if (!PORT) {
     console.error("Missing --port parameter");
@@ -24,7 +59,9 @@ export function startPluginServer(
   const app = express();
   app.use(bodyParser.json());
 
-  app.post("/command", async (req, res) => {
+  const requireAuth = makeAuth(TOKEN);
+
+  app.post("/command", requireAuth, async (req, res) => {
     const { command, args = {} } = req.body;
     const handler = commands[command];
 
@@ -40,7 +77,6 @@ export function startPluginServer(
     }
 
     let responded = false;
-
     const timer = setTimeout(() => {
       if (!responded) {
         responded = true;
@@ -74,16 +110,16 @@ export function startPluginServer(
     }
   });
 
-  // Защита от необработанных async-исключений
-  process.on("unhandled rejection", (reason) => {
+  process.on("unhandledRejection", (reason) => {
     console.error("UnhandledRejection:", reason);
   });
 
-  process.on("uncaught еxception", (err) => {
+  process.on("uncaughtException", (err) => {
     console.error("Uncaught Exception:", err);
   });
 
   app.listen(PORT, HOST, () => {
-    console.log(`🎧 ${pluginName} v${pluginVersion} running on http://${HOST}:${PORT}`);
+    console.log(`${pluginName} v${pluginVersion} running on http://${HOST}:${PORT}`);
+    if (TOKEN) console.log("🔒 Auth: Bearer token required");
   });
 }
