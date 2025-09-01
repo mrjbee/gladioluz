@@ -1,5 +1,4 @@
-import { CommandHandler } from "./commons/command";
-import { startPluginServer } from "./commons/server";
+import { startPluginServer, ProblemDetails, CommandHandler } from "@glz/plugins-base";
 import { kioskStartCommand, kioskStopCommand, loadRadioForCommand, nextCommand, playCommand, prevCommand } from "./youtube-kisosk-commands";
 
 const commands: Record<string, CommandHandler> = {

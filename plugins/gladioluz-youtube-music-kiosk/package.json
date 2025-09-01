@@ -12,6 +12,8 @@
   "license": "ISC",
   "description": "",
   "dependencies": {
+    "@glz/plugins-base": "file:../gladioluz-plugins-base",
+    "body-parser": "^2.2.0",
     "chrome-remote-interface": "^0.33.3",
     "express": "^5.1.0"
   },

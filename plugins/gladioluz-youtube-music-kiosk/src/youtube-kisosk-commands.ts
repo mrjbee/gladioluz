@@ -1,4 +1,5 @@
-import { CommandHandler, CommandContext, CommandResult } from './commons/command';
+import { CommandHandler, CommandContext, CommandResult } from "@glz/plugins-base";
+
 import { spawn, exec } from 'child_process';
 import { promisify } from 'util';
 import { config } from './config';
