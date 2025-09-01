@@ -49,7 +49,7 @@ export function startPluginServer(
   // optional token (CLI has priority; env as fallback)
   const TOKEN =
     process.argv.find((arg) => arg.startsWith("--token="))?.split("=")[1] ||
-    process.env.GLZ_PLUGIN_TOKEN;
+    process.env.PLUGIN_TOKEN;
 
   if (!PORT) {
     console.error("Missing --port parameter");

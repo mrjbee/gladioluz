@@ -5,7 +5,7 @@
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
     "start": "ts-node src/index.ts --port=5552 --token=usemeslowly",
-    "stage": "ts-node src/index.ts --port=$PLUGIN_PORT"
+    "stage": "ts-node src/index.ts --port=$PLUGIN_PORT --host=$PLUGIN_HOST"
   },
   "keywords": [],
   "author": "",
