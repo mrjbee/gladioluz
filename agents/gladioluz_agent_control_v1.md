@@ -16,7 +16,7 @@ Each command within the execution must have its own unique `commandId`. The stru
 
 Each command result is returned as a separate reply in the original Slack message thread.
 
-Each result reply must contain a JSON object with `commandId`, `status`, and `body`. For a failed command, `body` must use the common error format. Otherwise, the structure of `body` is determined by the command `type`.
+Each result must contain commandId and status. The status must be either ok or error. If the status is error, the result may also include an optional errorDescription.
 
 ## Command Types
 
