@@ -26,7 +26,7 @@ The `body` must contain the target `unitId` and a `command` object conforming to
 
 https://raw.githubusercontent.com/mrjbee/gladioluz/refs/heads/master/specs/gladioluz_mqtt_protocol.md
 
-Always set `body.command.user` to the constant string `"user"`.
+By default, set `body.command.user` to `"user"`. When the user explicitly asks to return the device to home automation control, set it to `"system"` and use any valid command value.
 
 Available unit classes, properties, and supported commands are defined at:
 
@@ -35,6 +35,17 @@ https://raw.githubusercontent.com/mrjbee/gladioluz/refs/heads/master/specs/gladi
 On successful execution, the result `body` contains the updated unit state conforming to the Unit State Events format defined at:
 
 https://raw.githubusercontent.com/mrjbee/gladioluz/refs/heads/master/specs/gladioluz_mqtt_protocol.md
+
+### gladioluz-unit-query
+
+The body must be the unitId of exactly one unit.
+
+On successful execution, the result body contains the latest known unit state conforming to the Unit State Events format defined at:
+
+https://raw.githubusercontent.com/mrjbee/gladioluz/refs/heads/master/specs/gladioluz_mqtt_protocol.md
+
+If the requested unit does not exist, the result must have status set to error and should include an errorDescription.
+
 
 ## Device Inventory
 
@@ -84,3 +95,30 @@ For ESP-based light units, only brightness control is used. Ignore the `effect` 
 | `wled.192_168_0_21.main` | `1` — Default; `2` — Xbox; `3` — OnMeeting; `4` — Party |
 | `wled.192_168_0_22.main` | `1` — Solid; `2` — Party: Red; `3` — Party: pink-aggressive; `4` — Party: pink-slow; `5` — Party: blue-aggressive; `6` — Party: blue-slow; `7` — Training; `8` — Quiet; `9` — Party: Orange; `10` — Entertainment; `11` — Work |
 | `wled.192_168_0_23.main` | `1` — Solid; `2` — Work; `3` — Party |
+
+### Policy Devices
+
+Policy units represent operating modes for home automation. They are similar to scenes: changing a policy value affects how related automations behave rather than directly controlling a physical device.
+
+| Unit ID | Commands | Property | Allowed values | Location | Effect |
+|---|---|---|---|---|---|
+| `platform.policy.living-room` | `context.setEnumValue`, `context.dropValue` | `current` | `usual`, `guest`, `quiet`, `party` | Living Room | Controls the living room colour scene, primarily the colour of the backlight behind the TV. `guest` means that someone is sleeping in the room and mainly causes the lights to turn off earlier. `quiet` enables quiet mode while Master is in a meeting. |
+| `platform.policy.master-room` | `context.setEnumValue`, `context.dropValue` | `current` | `work`, `entertainment`, `party`, `training`, `quiet`, `unleashed`, `projector` | Master Bedroom | Controls the Master Room lighting and colour scene according to the selected activity mode. `quiet` enables quiet mode while Master is in a meeting. |
+| `platform.policy.master-room-guest-override` | `context.setEnumValue` | `current` | `on`, `off` | Master Bedroom | `on` means that a guest is sleeping in the room. It mainly causes the lights to turn off earlier and makes the room automation ignore Master’s laptop. |
+| `platform.policy.master-room-party` | `context.setEnumValue` | `current` | `red`, `pink-aggressive`, `pink-slow`, `blue-aggressive`, `blue-slow`, `orange` | Master Bedroom | Selects the colour scheme for Saturday relaxation in the Master Room. |
+
+For policies supporting `context.dropValue`, the `current` property may be `null`.
+
+
+### Other Devices
+
+| Unit ID | Class | Commands | Properties | Location | Aliases / Purpose |
+|---|---|---|---|---|---|
+| `esp.ESP_bg_balcony.buzzer-main` | `class.Buzzer` | `common.playTone` | `beep` | Balcony | balcony buzzer |
+| `esp.ESP_bg_entance_door.magnet-entrance` | `class.Magnet` | — | `value` | Entrance | entrance door, front door |
+| `android.androidbox.main` | `class.TV` | — | `app`, `online` | Living Room | Android Box, TV box |
+| `android.chromecast.main` | `class.TV` | — | `app`, `online` | — | Chromecast, Portable Projector companion |
+| `xbox.white.main` | `class.Console` | — | `app`, `wifi`, `online` | — | white Xbox; portable console with an attached screen, sometimes connected to the Living Room TV |
+| `pc.fakelaptop.microphone-master` | `class.Microphone` | — | `under_usage` | Master Bedroom / Balcony | Master’s laptop microphone |
+| `pc.fakelaptop.screen-main` | `class.Screen` | — | `locked` | Master Bedroom / Balcony | Master’s laptop screen |
+| `pc.fakelaptop.x11-main` | `class.X11` | — | `apps` | Master Bedroom / Balcony | applications running on Master’s laptop |
