@@ -45,7 +45,7 @@ This document summarizes the known **unit classes** used within the Gladioluz pl
 | `effect`       | boolean            | Visual effect enabled/disabled |
 | `preset`       | integer            | Preset index (implementation specific) |
 | `beep`         | string             | Format `"tone,delay"` (Hz, ms) |
-| `value` (Magnet) | boolean          | `true` = open, `false` = closed |
+| `value` (Magnet) | boolean          | `false` = open circuit, `true` = closed circuit |
 | `value` (Illumination) | integer   | Light level (scale depends on firmware) |
 | `app`          | string \/ null     | Active application ID or null |
 | `wifi`         | boolean            | Wi‑Fi connection status |
