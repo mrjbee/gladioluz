@@ -106,6 +106,7 @@ Policy units represent operating modes for home automation. They are similar to 
 | `platform.policy.master-room` | `context.setEnumValue`, `context.dropValue` | `current` | `work`, `entertainment`, `party`, `training`, `quiet`, `unleashed`, `projector` | Master Bedroom | Controls the Master Room lighting and colour scene according to the selected activity mode. `quiet` enables quiet mode while Master is in a meeting. |
 | `platform.policy.master-room-guest-override` | `context.setEnumValue` | `current` | `on`, `off` | Master Bedroom | `on` means that a guest is sleeping in the room. It mainly causes the lights to turn off earlier and makes the room automation ignore Master’s laptop. |
 | `platform.policy.master-room-party` | `context.setEnumValue` | `current` | `red`, `pink-aggressive`, `pink-slow`, `blue-aggressive`, `blue-slow`, `orange` | Master Bedroom | Selects the colour scheme for Saturday relaxation in the Master Room. |
+| `platform.policy.alarm-disable-override` | `context.setEnumValue` | `current` | `on`, `off` | Global | Overrides normal alarm scheduling. `on` disables alarm execution, including on working days; `off` leaves alarm automations under their normal working-day logic. |
 
 For policies supporting `context.dropValue`, the `current` property may be `null`.
 
