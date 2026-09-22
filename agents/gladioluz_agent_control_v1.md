@@ -76,6 +76,10 @@ Supported calls:
 - Set volume: `method: "POST"`, `path: "/volume/set"`, `body: { "value": <volume> }`
 - Wake: `method: "POST"`, `path: "/device/wake"`
 - Lock: `method: "POST"`, `path: "/device/lock"`
+- Play active media: `method: "POST"`, `path: "/media/active/play"`
+- Pause active media: `method: "POST"`, `path: "/media/active/pause"`
+- Previous active media item: `method: "POST"`, `path: "/media/active/prev"`
+- Next active media item: `method: "POST"`, `path: "/media/active/next"`
 - Open YouTube or YouTube Music URL: `method: "POST"`, `path: "/media/by-package/com.google.android.youtube/open"`, `body: { "url": "<url>" }`
 - Open any other media URL in VLC: `method: "POST"`, `path: "/media/by-package/org.videolan.vlc/open"`, `body: { "url": "<url>" }`
 
