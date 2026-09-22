@@ -85,6 +85,17 @@ URL routing:
 
 For JSON request bodies, set `Content-Type: application/json`.
 
+### Target: `fakelaptop`
+
+Master laptop HTTP agent.
+
+Supported calls:
+
+- Lock screen: `method: "POST"`, `path: "/command"`, `body: { "command": "lock" }`
+- Unlock screen: `method: "POST"`, `path: "/command"`, `body: { "command": "unlock" }`
+
+For JSON request bodies, set `Content-Type: application/json`.
+
 ## Device Inventory
 
 ### Beacon Devices
