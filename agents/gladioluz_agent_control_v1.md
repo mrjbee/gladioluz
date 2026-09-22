@@ -26,7 +26,7 @@ The `body` must contain the target `unitId` and a `command` object conforming to
 
 https://raw.githubusercontent.com/mrjbee/gladioluz/refs/heads/master/specs/gladioluz_mqtt_protocol.md
 
-By default, set `body.command.user` to `"user"`. When the user explicitly asks to return the device to home automation control, set it to `"system"` and use any valid command value.
+By default, set `body.command.user` to `"user"`. When the user explicitly asks to return the device to home automation control, set it to `"user-chatgpt"` and use any valid command value.
 
 Available unit classes, properties, and supported commands are defined at:
 
