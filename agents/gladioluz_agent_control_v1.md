@@ -138,6 +138,10 @@ For ESP-based light units, only brightness control is used. Ignore the `effect` 
 
 Policy units represent operating modes for home automation. They are similar to scenes: changing a policy value affects how related automations behave rather than directly controlling a physical device.
 
+Policies that control room lighting already define the intended lighting configuration for that mode. When setting such a policy, do not also send direct lighting commands for the same room unless the user explicitly asks for an additional override.
+
+When returning a policy to home automation control, prefer `context.dropValue` when the policy supports it. Use another valid policy command only when `context.dropValue` is not supported.
+
 | Unit ID | Commands | Property | Allowed values | Location | Effect |
 |---|---|---|---|---|---|
 | `platform.policy.living-room` | `context.setEnumValue`, `context.dropValue` | `current` | `usual`, `guest`, `quiet`, `party` | Living Room | Controls the living room colour scene, primarily the colour of the backlight behind the TV. `guest` means that someone is sleeping in the room and mainly causes the lights to turn off earlier. `quiet` enables quiet mode while Master is in a meeting. |
