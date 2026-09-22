@@ -76,7 +76,12 @@ Supported calls:
 - Set volume: `method: "POST"`, `path: "/volume/set"`, `body: { "value": <volume> }`
 - Wake: `method: "POST"`, `path: "/device/wake"`
 - Lock: `method: "POST"`, `path: "/device/lock"`
-- Open YouTube URL: `method: "POST"`, `path: "/media/by-package/com.google.android.youtube/open"`, `body: { "url": "<url>" }`
+- Open YouTube or YouTube Music URL: `method: "POST"`, `path: "/media/by-package/com.google.android.youtube/open"`, `body: { "url": "<url>" }`
+- Open any other media URL in VLC: `method: "POST"`, `path: "/media/by-package/org.videolan.vlc/open"`, `body: { "url": "<url>" }`
+
+URL routing:
+- YouTube and YouTube Music URLs must be opened with the YouTube call.
+- All other media URLs must be opened with the VLC call.
 
 For JSON request bodies, set `Content-Type: application/json`.
 
