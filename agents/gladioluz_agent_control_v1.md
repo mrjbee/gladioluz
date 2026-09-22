@@ -46,6 +46,39 @@ https://raw.githubusercontent.com/mrjbee/gladioluz/refs/heads/master/specs/gladi
 
 If the requested unit does not exist, the result must have status set to error and should include an errorDescription.
 
+### `gladioluz-http-call`
+
+The `body` must contain:
+
+- `target` — required target name.
+- `method` — required HTTP method.
+- `path` — required path relative to the configured target base URL.
+- `headers` — optional HTTP headers.
+- `body` — optional request body.
+
+The gateway resolves the target base URL from configuration. The caller must not provide a host or base URL.
+
+On successful execution, the result `body` contains only the HTTP response body.
+
+For a failed HTTP response, the result must have `status` set to `error` and the HTTP status code in `errorDescription`.
+
+An unknown target must return `status: "error"`.
+
+## HTTP Targets
+
+### Target: `oldtab`
+
+Always-on Android tablet located in the Master Bedroom and connected to the room audio system. It is primarily used to play video and music in the Master Bedroom.
+
+Supported calls:
+
+- Get volume: `method: "GET"`, `path: "/volume"`
+- Set volume: `method: "POST"`, `path: "/volume/set"`, `body: { "value": <volume> }`
+- Wake: `method: "POST"`, `path: "/device/wake"`
+- Lock: `method: "POST"`, `path: "/device/lock"`
+- Open YouTube URL: `method: "POST"`, `path: "/media/by-package/com.google.android.youtube/open"`, `body: { "url": "<url>" }`
+
+For JSON request bodies, set `Content-Type: application/json`.
 
 ## Device Inventory
 
