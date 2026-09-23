@@ -22,7 +22,7 @@ Each result must contain commandId and status. The status must be either ok or e
 
 ### `gladioluz-unit-command`
 
-The `body` must contain the target `unitId` and a `command` object conforming to the Unit Commands format defined at:
+The `body` must contain the target `unitId` and a `command` object with the required fields `alias`, `user`, and `value`, conforming to the Unit Commands format defined at:
 
 https://raw.githubusercontent.com/mrjbee/gladioluz/refs/heads/master/specs/gladioluz_mqtt_protocol.md
 
