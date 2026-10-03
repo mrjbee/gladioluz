@@ -22,6 +22,8 @@ Each result must contain commandId and status. The status must be either ok or e
 
 ### `gladioluz-unit-command`
 
+Executes a command on a Gladioluz unit.
+
 The `body` must contain the target `unitId` and a `command` object with the required fields `alias`, `user`, and `value`, conforming to the Unit Commands format defined at:
 
 https://raw.githubusercontent.com/mrjbee/gladioluz/refs/heads/master/specs/gladioluz_mqtt_protocol.md
@@ -38,6 +40,8 @@ https://raw.githubusercontent.com/mrjbee/gladioluz/refs/heads/master/specs/gladi
 
 ### gladioluz-unit-query
 
+Returns the latest known state of a Gladioluz unit.
+
 The body must be the unitId of exactly one unit.
 
 On successful execution, the result body contains the latest known unit state conforming to the Unit State Events format defined at:
@@ -47,6 +51,8 @@ https://raw.githubusercontent.com/mrjbee/gladioluz/refs/heads/master/specs/gladi
 If the requested unit does not exist, the result must have status set to error and should include an errorDescription.
 
 ### `gladioluz-http-call`
+
+Performs an HTTP request against a configured target.
 
 The `body` must contain:
 
@@ -63,6 +69,18 @@ On successful execution, the result `body` contains only the HTTP response body.
 For a failed HTTP response, the result must have `status` set to `error` and the HTTP status code in `errorDescription`.
 
 An unknown target must return `status: "error"`.
+
+### `send-notification`
+
+Sends a notification to the family or Master/Boss channel.
+
+The `body` must contain:
+
+- `message` — required non-empty string.
+- `private` — optional boolean, defaults to `false`.
+
+`private: false` routes to the family channel.  
+`private: true` routes to the Master/Boss channel.
 
 ## HTTP Targets
 
