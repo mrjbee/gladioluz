@@ -82,6 +82,8 @@ The `body` must contain:
 `private: false` routes to the family channel.  
 `private: true` routes to the Master/Boss channel.
 
+Only plain multiline text is supported. Do not use emoji, Markdown formatting, attachments, or other rich content.
+
 ## HTTP Targets
 
 ### Target: `oldtab`
