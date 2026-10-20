@@ -120,6 +120,22 @@ Supported calls:
 
 For JSON request bodies, set `Content-Type: application/json`.
 
+### Target: `nodered`
+
+Node-RED automation engine. Provides access to selected global context variables.
+
+Supported methods:
+
+- `GET /api/context/{key}` — returns the current value or `null` if unset.
+- `PUT /api/context/{key}` — sets the value. Use `Content-Type: text/plain`.
+- `DELETE /api/context/{key}` — removes the value.
+
+#### Supported Context Keys
+
+| Key | Example Value (body) | Description |
+|---|---|---|
+| `late_night_track_url` | `https://www.youtube.com/watch?v=jfDj57-TqRY` | Overrides automatic late-night music rotation with a YouTube or YouTube Music URL. DELETE restores automatic rotation. |
+
 ## Device Inventory
 
 ### Beacon Devices
