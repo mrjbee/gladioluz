@@ -159,9 +159,9 @@ For JSON request bodies, set `Content-Type: application/json`. Connected-device 
 
 #### Devices
 
-| Name | UUID | Model | IP |
-|---|---|---|---|
-| Portable TV | `eedfedfb86f289550624fb4ee2608101` | LEAP-S1 | `192.168.0.190` |
+| Name | UUID | Model | IP | Description |
+|---|---|---|---|---|
+| Portable TV | `eedfedfb86f289550624fb4ee2608101` | LEAP-S1 | `192.168.0.190` | Living room TV |
 
 ## Device Inventory
 
