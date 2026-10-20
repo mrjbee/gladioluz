@@ -137,6 +137,32 @@ Supported methods:
 | `late_night_track_url` | `https://www.youtube.com/watch?v=jfDj57-TqRY` | Overrides automatic late-night music rotation with a YouTube or YouTube Music URL. DELETE restores automatic rotation. |
 | `morning_track_url` | `https://www.youtube.com/watch?v=eRErtHjd1wg` | Overrides automatic morning alarm music rotation with a YouTube or YouTube Music URL. DELETE restores automatic rotation. |
 
+### Target: `chromecast`
+
+Google Cast service for discovering devices and controlling the currently connected receiver. Only one Cast connection can be active at a time.
+
+Supported methods:
+
+| Method | Path | Description |
+|---|---|---|
+| `GET` | `/devices` | Discover available Cast devices. |
+| `POST` | `/devices/{uuid}/connect` | Connect to a device; closes any previous connection. |
+| `GET` | `/devices/connected` | Get the connected device. |
+| `DELETE` | `/devices/connect` | Disconnect the current device. |
+| `GET` | `/devices/connected/status` | Get the receiver status. |
+| `GET` | `/devices/connected/volume` | Get receiver volume. |
+| `PUT` | `/devices/connected/volume` | Set volume: `body: {"level":0.5}` (range `0.0`–`1.0`). |
+| `POST` | `/devices/connected/media` | Control playback: `body: {"command":"pause"}` (`play`, `pause`, `stop`). |
+| `POST` | `/devices/connected/youtube` | Play YouTube: `body: {"url":"https://www.youtube.com/watch?v=dQw4w9WgXcQ"}`. |
+
+For JSON request bodies, set `Content-Type: application/json`. Connected-device calls return 404 if the device is no longer in the discovery registry; disconnect remains available.
+
+#### Devices
+
+| Name | UUID | Model | IP |
+|---|---|---|---|
+| Portable TV | `eedfedfb86f289550624fb4ee2608101` | LEAP-S1 | `192.168.0.190` |
+
 ## Device Inventory
 
 ### Beacon Devices
