@@ -136,6 +136,7 @@ Supported methods:
 |---|---|---|
 | `late_night_track_url` | `https://www.youtube.com/watch?v=jfDj57-TqRY` | Overrides automatic late-night music rotation with a YouTube or YouTube Music URL. DELETE restores automatic rotation. |
 | `morning_track_url` | `https://www.youtube.com/watch?v=eRErtHjd1wg` | Overrides automatic morning alarm music rotation with a YouTube or YouTube Music URL. DELETE restores automatic rotation. |
+| `morning_chromecast_url` | `https://www.youtube.com/watch?v=rzH84fxOuO0` | Overrides automatic morning video rotation on the Living Room TV with a YouTube URL. DELETE restores automatic rotation. |
 
 ### Target: `chromecast`
 
